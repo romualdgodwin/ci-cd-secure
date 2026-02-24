@@ -40,7 +40,7 @@ jobs:
 
             docker run -d \
               --name my-nodejs-app-container \
-              -p 3002:3000 \
+              -p 3028:3000 \
               -e DATABASE_URL=postgres://postgres:mysecretpassword@db:5432/mydb \
               -e NODE_ENV=production \
               --restart unless-stopped \
