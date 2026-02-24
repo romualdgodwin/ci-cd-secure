@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.9"
 
       - name: Install dependencies
         run: |
@@ -60,3 +60,19 @@ jobs:
               -e NODE_ENV=production \
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/my-nodejs-app:latest
+
+      - name: Health Check
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sleep 5
+            if curl -f http://localhost:3028/ > /dev/null 2>&1; then
+              echo "Deployment successful! Service is running."
+              exit 0
+            else
+              echo "Deployment failed! Service is not responding."
+              exit 1
+            fi
