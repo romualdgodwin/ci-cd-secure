@@ -1,4 +1,4 @@
-FROM python:3.14.0rc1-alpine
+FROM python:3.11.14-alpine3.23
 
 WORKDIR /app
 
