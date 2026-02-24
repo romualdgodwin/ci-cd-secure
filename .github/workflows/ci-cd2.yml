@@ -39,12 +39,35 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker image
-        uses: docker/build-push-action@v5
+      - name: Build Docker image
+        run: docker build -t devsecure-api .
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@master
         with:
-          context: .
-          push: true
-          tags: romualdgodwin/devsecure-api:latest
+          image-ref: "devsecure-api"
+          format: "table"
+          exit-code: "1"
+          severity: "CRITICAL"
+
+      - name: Run Snyk Scan
+        uses: snyk/actions/docker@master
+        continue-on-error: true
+        with:
+          image: devsecure-api:latest
+          args: --file=Dockerfile --json-file-output=snyk-report.json
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Scan for secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Docker image
+        run: |
+          docker tag devsecure-api ${{ secrets.DOCKER_USERNAME }}/devsecure-api:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/devsecure-api:latest
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
