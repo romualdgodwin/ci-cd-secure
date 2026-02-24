@@ -39,7 +39,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: romualdgodwin/ci-cd-secure:latest
+          tags: romualdgodwin/devsecure-api:latest
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
@@ -48,7 +48,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull romualdgodwin/ci-cd-secure:latest
+            docker pull romualdgodwin/devsecure-api:latest
 
             docker stop romuald-api-container || true
             docker rm romuald-api-container || true
@@ -57,7 +57,7 @@ jobs:
               --name romuald-api-container \
               -p 3028:3000 \
               --restart unless-stopped \
-              romualdgodwin/ci-cd-secure:latest
+              romualdgodwin/devsecure-api:latest
 
       - name: Health Check
         uses: appleboy/ssh-action@v1.0.3
