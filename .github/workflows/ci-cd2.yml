@@ -39,7 +39,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/my-nodejs-app:latest
+          tags: romualdgodwin/ci-cd-secure:latest
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
@@ -48,18 +48,16 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-nodejs-app:latest
+            docker pull romualdgodwin/ci-cd-secure:latest
 
-            docker stop my-nodejs-app-container || true
-            docker rm my-nodejs-app-container || true
+            docker stop romuald-api-container || true
+            docker rm romuald-api-container || true
 
             docker run -d \
-              --name my-nodejs-app-container \
+              --name romuald-api-container \
               -p 3028:3000 \
-              -e DATABASE_URL=postgres://postgres:mysecretpassword@db:5432/mydb \
-              -e NODE_ENV=production \
               --restart unless-stopped \
-              ${{ secrets.DOCKER_USERNAME }}/my-nodejs-app:latest
+              romualdgodwin/ci-cd-secure:latest
 
       - name: Health Check
         uses: appleboy/ssh-action@v1.0.3
